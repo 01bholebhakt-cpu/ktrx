@@ -1,0 +1,1682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>KTRX — Katihar Battle Royale</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800;900&family=Inter:wght@500;600;700;800&display=swap');
+
+:root{
+  --acid:#eaff00;
+  --white:#f4f5f2;
+  --muted:#a5aaa7;
+  --dark:#080a0b;
+  --panel:rgba(5,8,9,.88);
+  --line:rgba(255,255,255,.16);
+  --red:#ff394b;
+  --green:#55ff57;
+}
+
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+html,body{
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:#050606;
+  color:white;
+  font-family:Inter,Arial,sans-serif;
+}
+
+button{
+  font-family:inherit;
+}
+
+/* =====================================================
+   CINEMATIC BACKGROUND
+===================================================== */
+
+#lobby{
+  position:fixed;
+  inset:0;
+  background:#111;
+}
+
+#background{
+  position:absolute;
+  inset:0;
+
+  background-image:
+    linear-gradient(
+      90deg,
+      rgba(0,0,0,.42) 0%,
+      rgba(0,0,0,.04) 35%,
+      rgba(0,0,0,.02) 70%,
+      rgba(0,0,0,.45) 100%
+    ),
+    linear-gradient(
+      0deg,
+      rgba(0,0,0,.62),
+      transparent 35%,
+      rgba(0,0,0,.12)
+    ),
+    url("assets/lobby.jpg");
+
+  background-size:cover;
+  background-position:center center;
+  background-repeat:no-repeat;
+
+  filter:saturate(.98) contrast(1.05);
+}
+
+/* cinematic overlays */
+
+#background::after{
+  content:"";
+  position:absolute;
+  inset:0;
+
+  background:
+    radial-gradient(
+      circle at 50% 45%,
+      transparent 25%,
+      rgba(0,0,0,.2) 65%,
+      rgba(0,0,0,.62) 100%
+    );
+
+  pointer-events:none;
+}
+
+.scanlines{
+  position:fixed;
+  inset:0;
+  z-index:80;
+  pointer-events:none;
+
+  opacity:.035;
+
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      transparent 3px,
+      white 4px
+    );
+}
+
+/* =====================================================
+   TOP NAV
+===================================================== */
+
+.top{
+  position:fixed;
+  z-index:30;
+
+  top:0;
+  left:0;
+  right:0;
+
+  height:70px;
+
+  display:flex;
+  align-items:center;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(3,5,6,.97),
+      rgba(3,5,6,.72)
+    );
+
+  border-bottom:1px solid rgba(255,255,255,.13);
+
+  box-shadow:0 5px 25px rgba(0,0,0,.35);
+}
+
+.logo{
+  width:280px;
+  padding-left:20px;
+
+  font-family:"Barlow Condensed";
+  font-style:italic;
+  font-weight:900;
+
+  font-size:52px;
+  letter-spacing:-4px;
+  line-height:.7;
+}
+
+.logo span{
+  color:var(--acid);
+}
+
+.logo small{
+  display:block;
+
+  margin-top:10px;
+
+  font-family:Inter;
+  font-style:normal;
+
+  color:#b8bcb9;
+
+  font-size:8px;
+  letter-spacing:2px;
+}
+
+.nav{
+  height:100%;
+
+  display:flex;
+  align-items:center;
+
+  gap:3px;
+}
+
+.nav button{
+  height:100%;
+  min-width:102px;
+
+  border:0;
+  background:transparent;
+
+  color:#c3c7c4;
+
+  font-family:"Barlow Condensed";
+  font-size:17px;
+  font-weight:800;
+
+  cursor:pointer;
+}
+
+.nav button:hover,
+.nav button.active{
+  background:var(--acid);
+  color:#050606;
+}
+
+.resources{
+  margin-left:auto;
+
+  display:flex;
+  align-items:center;
+  gap:10px;
+
+  padding-right:15px;
+}
+
+.money{
+  display:flex;
+  align-items:center;
+  gap:6px;
+
+  font-family:"Barlow Condensed";
+  font-size:20px;
+  font-weight:800;
+}
+
+.coin{
+  width:26px;
+  height:26px;
+
+  display:grid;
+  place-items:center;
+
+  border-radius:50%;
+
+  background:
+    radial-gradient(
+      circle,
+      #fff3ad,
+      #d99b20 65%,
+      #805000
+    );
+
+  color:#5c3800;
+  border:2px solid #ffd66a;
+}
+
+.gem{
+  width:22px;
+  height:22px;
+
+  transform:rotate(45deg);
+
+  background:#55dfff;
+  border:2px solid #c4f7ff;
+}
+
+.topbtn{
+  width:38px;
+  height:38px;
+
+  border:1px solid rgba(255,255,255,.16);
+
+  background:rgba(255,255,255,.04);
+
+  color:#eee;
+
+  cursor:pointer;
+}
+
+.topbtn:hover{
+  background:var(--acid);
+  color:#000;
+}
+
+/* =====================================================
+   LEFT PROFILE
+===================================================== */
+
+.left{
+  position:fixed;
+  z-index:25;
+
+  top:88px;
+  left:20px;
+
+  width:315px;
+}
+
+.profile{
+  height:78px;
+
+  display:flex;
+  align-items:center;
+
+  padding:9px;
+
+  background:rgba(5,8,9,.90);
+
+  border:1px solid rgba(255,255,255,.16);
+}
+
+.avatar{
+  width:58px;
+  height:58px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #48534c,
+      #111513
+    );
+
+  border:1px solid #778078;
+
+  display:grid;
+  place-items:center;
+
+  font-family:"Barlow Condensed";
+  font-size:29px;
+  font-weight:900;
+
+  color:var(--acid);
+}
+
+.profile-info{
+  padding-left:11px;
+  flex:1;
+}
+
+.id{
+  font-family:"Barlow Condensed";
+  font-size:20px;
+  font-weight:800;
+}
+
+.level{
+  margin-top:4px;
+
+  font-family:"Barlow Condensed";
+  font-size:13px;
+
+  color:#b7bbb8;
+}
+
+.level b{
+  color:white;
+}
+
+.xp{
+  height:5px;
+  width:115px;
+
+  margin-top:5px;
+
+  background:#272b29;
+}
+
+.xp i{
+  display:block;
+  width:63%;
+  height:100%;
+
+  background:var(--acid);
+}
+
+/* =====================================================
+   LEFT MENU
+===================================================== */
+
+.menu{
+  margin-top:10px;
+}
+
+.menu-item{
+  position:relative;
+
+  width:100%;
+  height:55px;
+
+  display:flex;
+  align-items:center;
+
+  border:0;
+  border-bottom:1px solid rgba(255,255,255,.08);
+
+  background:rgba(5,8,9,.87);
+
+  color:#eee;
+
+  cursor:pointer;
+
+  text-align:left;
+
+  transition:.15s;
+}
+
+.menu-item:hover{
+  background:rgba(234,255,0,.94);
+  color:#000;
+}
+
+.menu-icon{
+  width:55px;
+
+  text-align:center;
+
+  font-size:21px;
+}
+
+.menu-label{
+  font-family:"Barlow Condensed";
+  font-size:17px;
+  font-weight:800;
+}
+
+.menu-small{
+  display:block;
+
+  color:#777f7b;
+
+  font-size:7px;
+  letter-spacing:1.5px;
+
+  margin-top:2px;
+}
+
+.menu-item:hover .menu-small{
+  color:#222;
+}
+
+.notification{
+  position:absolute;
+  right:10px;
+
+  width:7px;
+  height:7px;
+
+  border-radius:50%;
+
+  background:var(--red);
+  box-shadow:0 0 10px var(--red);
+}
+
+/* =====================================================
+   RIGHT PANEL
+===================================================== */
+
+.right{
+  position:fixed;
+  z-index:25;
+
+  right:20px;
+  top:88px;
+
+  width:335px;
+}
+
+/* =====================================================
+   MAP
+===================================================== */
+
+.map{
+  position:relative;
+
+  height:230px;
+
+  overflow:hidden;
+
+  border:2px solid rgba(255,255,255,.22);
+
+  background:
+    linear-gradient(
+      135deg,
+      #415d43,
+      #1b3228
+    );
+
+  box-shadow:0 12px 35px rgba(0,0,0,.55);
+}
+
+.map::before{
+  content:"";
+
+  position:absolute;
+  inset:0;
+
+  background:
+    repeating-linear-gradient(
+      45deg,
+      transparent 0 25px,
+      rgba(255,255,255,.07) 26px 27px
+    );
+
+  opacity:.45;
+}
+
+.map-grid{
+  position:absolute;
+  inset:0;
+
+  background:
+    linear-gradient(
+      rgba(255,255,255,.13) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(255,255,255,.13) 1px,
+      transparent 1px
+    );
+
+  background-size:30px 30px;
+
+  opacity:.28;
+}
+
+.map-title{
+  position:absolute;
+  z-index:3;
+
+  top:13px;
+  left:13px;
+
+  font-family:"Barlow Condensed";
+  font-size:18px;
+  font-weight:900;
+
+  text-shadow:0 2px 5px #000;
+}
+
+.zone{
+  position:absolute;
+
+  width:160px;
+  height:160px;
+
+  border-radius:50%;
+
+  left:82px;
+  top:35px;
+
+  border:2px solid var(--acid);
+
+  background:rgba(234,255,0,.07);
+
+  box-shadow:0 0 20px rgba(234,255,0,.18);
+}
+
+.map-dot{
+  position:absolute;
+
+  width:7px;
+  height:7px;
+
+  border-radius:50%;
+
+  background:white;
+
+  box-shadow:0 0 10px white;
+}
+
+.enemy{
+  background:var(--red);
+  box-shadow:0 0 10px var(--red);
+}
+
+.expand{
+  position:absolute;
+  z-index:4;
+
+  right:10px;
+  top:8px;
+
+  font-size:19px;
+}
+
+/* =====================================================
+   SOLO
+===================================================== */
+
+.solo{
+  width:100%;
+  height:51px;
+
+  margin-top:8px;
+
+  border:0;
+
+  background:var(--acid);
+  color:#050606;
+
+  font-family:"Barlow Condensed";
+  font-size:19px;
+  font-weight:900;
+
+  cursor:pointer;
+
+  text-align:center;
+}
+
+.solo small{
+  display:block;
+
+  font-family:Inter;
+
+  font-size:7px;
+  letter-spacing:2px;
+
+  opacity:.6;
+}
+
+/* =====================================================
+   MATCH CARD
+===================================================== */
+
+.match{
+  position:relative;
+
+  height:128px;
+
+  margin-top:8px;
+
+  padding:15px;
+
+  overflow:hidden;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(8,11,12,.94),
+      rgba(30,35,34,.86)
+    );
+
+  border:1px solid rgba(255,255,255,.14);
+}
+
+.match::after{
+  content:"KATIHAR";
+
+  position:absolute;
+
+  right:-15px;
+  bottom:-28px;
+
+  font-family:"Barlow Condensed";
+
+  font-size:90px;
+  font-weight:900;
+
+  color:rgba(255,255,255,.035);
+}
+
+.match h2{
+  position:relative;
+  z-index:2;
+
+  font-family:"Barlow Condensed";
+  font-size:34px;
+  font-weight:900;
+}
+
+.match p{
+  position:relative;
+  z-index:2;
+
+  color:#a9aeaa;
+
+  font-size:9px;
+  letter-spacing:1px;
+}
+
+.details{
+  position:absolute;
+  z-index:3;
+
+  right:13px;
+  bottom:13px;
+
+  font-family:"Barlow Condensed";
+  font-size:16px;
+  font-weight:800;
+}
+
+/* =====================================================
+   START
+===================================================== */
+
+.start{
+  width:100%;
+  height:66px;
+
+  margin-top:8px;
+
+  border:0;
+
+  background:var(--acid);
+  color:#050606;
+
+  cursor:pointer;
+
+  font-family:"Barlow Condensed";
+  font-size:30px;
+  font-weight:900;
+
+  transition:.15s;
+}
+
+.start:hover{
+  background:#f3ff62;
+  transform:translateY(-2px);
+}
+
+.start small{
+  display:block;
+
+  font-family:Inter;
+  font-size:8px;
+  letter-spacing:2px;
+
+  opacity:.6;
+}
+
+/* =====================================================
+   BOTTOM LOADOUT
+===================================================== */
+
+.loadout{
+  position:fixed;
+  z-index:30;
+
+  left:20px;
+  right:375px;
+  bottom:43px;
+
+  height:108px;
+
+  display:grid;
+
+  grid-template-columns:
+    1.25fr
+    1fr
+    1fr
+    1fr
+    1fr
+    1fr;
+
+  gap:4px;
+}
+
+.slot{
+  position:relative;
+
+  overflow:hidden;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(5,8,9,.94),
+      rgba(23,27,28,.86)
+    );
+
+  border:1px solid rgba(255,255,255,.14);
+
+  padding:8px;
+
+  cursor:pointer;
+}
+
+.slot:hover{
+  border-color:var(--acid);
+}
+
+.slot-title{
+  color:#a5aaa6;
+
+  font-size:8px;
+  letter-spacing:1px;
+}
+
+.slot-art{
+  position:absolute;
+
+  left:15%;
+  right:15%;
+  top:37px;
+
+  height:10px;
+
+  background:#8b928d;
+
+  box-shadow:
+    0 5px 0 #242925;
+}
+
+.slot-art.rifle{
+  transform:rotate(-7deg);
+}
+
+.slot-art.pistol{
+  width:70px;
+  left:28%;
+
+  transform:rotate(-5deg);
+}
+
+.slot-art.knife{
+  width:75px;
+  left:27%;
+
+  transform:rotate(-25deg);
+}
+
+.slot-art.grenade{
+  width:25px;
+  height:32px;
+
+  left:43%;
+  top:29px;
+
+  border-radius:8px;
+
+  background:#48534a;
+
+  border:2px solid #818a82;
+
+  box-shadow:none;
+}
+
+.slot-art.med{
+  width:45px;
+  height:33px;
+
+  left:37%;
+  top:28px;
+
+  background:#68716b;
+
+  border:2px solid #a5aaa5;
+
+  box-shadow:none;
+}
+
+.slot-art.med::after{
+  content:"+";
+
+  display:grid;
+  place-items:center;
+
+  width:100%;
+  height:100%;
+
+  color:#ff4242;
+
+  font-size:23px;
+  font-weight:900;
+}
+
+.slot-name{
+  position:absolute;
+
+  bottom:8px;
+  left:9px;
+
+  font-family:"Barlow Condensed";
+  font-size:14px;
+  font-weight:800;
+}
+
+/* =====================================================
+   BOTTOM RIGHT SHORTCUTS
+===================================================== */
+
+.shortcuts{
+  position:fixed;
+  z-index:30;
+
+  right:20px;
+  bottom:43px;
+
+  width:335px;
+
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+
+  gap:4px;
+}
+
+.shortcut{
+  height:108px;
+
+  border:1px solid rgba(255,255,255,.14);
+
+  background:rgba(5,8,9,.91);
+
+  color:white;
+
+  cursor:pointer;
+
+  font-family:"Barlow Condensed";
+  font-weight:800;
+  font-size:14px;
+}
+
+.shortcut:hover{
+  background:var(--acid);
+  color:#000;
+}
+
+.shortcut-icon{
+  display:block;
+
+  font-size:28px;
+
+  margin-bottom:8px;
+}
+
+/* =====================================================
+   FOOTER
+===================================================== */
+
+.footer{
+  position:fixed;
+  z-index:50;
+
+  left:0;
+  right:0;
+  bottom:0;
+
+  height:38px;
+
+  display:flex;
+  align-items:center;
+
+  padding:0 20px;
+
+  background:rgba(2,4,5,.96);
+
+  border-top:1px solid rgba(255,255,255,.12);
+
+  color:#8b918d;
+
+  font-size:9px;
+}
+
+.world-chat{
+  color:#9cff00;
+  margin-right:8px;
+}
+
+.footer-right{
+  margin-left:auto;
+
+  color:#8b918d;
+}
+
+.signal{
+  color:var(--green);
+  font-size:15px;
+  margin-left:7px;
+}
+
+/* =====================================================
+   MATCHMAKING
+===================================================== */
+
+.modal{
+  position:fixed;
+  z-index:100;
+
+  inset:0;
+
+  display:none;
+  align-items:center;
+  justify-content:center;
+
+  background:rgba(0,0,0,.82);
+
+  backdrop-filter:blur(12px);
+}
+
+.modal.open{
+  display:flex;
+}
+
+.modal-box{
+  width:500px;
+
+  padding:30px;
+
+  background:#080b0c;
+
+  border:1px solid rgba(234,255,0,.35);
+
+  box-shadow:0 25px 90px rgba(0,0,0,.8);
+}
+
+.modal-title{
+  font-family:"Barlow Condensed";
+  font-size:48px;
+  font-weight:900;
+}
+
+.modal-title span{
+  color:var(--acid);
+}
+
+.modal-info{
+  margin-top:15px;
+
+  color:#929893;
+
+  font-size:10px;
+  line-height:1.7;
+}
+
+.progress{
+  height:4px;
+
+  margin-top:24px;
+
+  background:#1d221f;
+}
+
+.progress i{
+  display:block;
+
+  height:100%;
+  width:20%;
+
+  background:var(--acid);
+
+  animation:load 1.2s infinite alternate;
+}
+
+@keyframes load{
+  from{width:10%}
+  to{width:95%}
+}
+
+.queue-status{
+  margin-top:15px;
+
+  font-family:"Barlow Condensed";
+  font-size:20px;
+}
+
+.cancel{
+  width:100%;
+  height:44px;
+
+  margin-top:20px;
+
+  background:transparent;
+
+  border:1px solid rgba(255,255,255,.15);
+
+  color:#aaa;
+
+  cursor:pointer;
+}
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media(max-width:1000px){
+
+  .logo{
+    width:180px;
+    font-size:40px;
+  }
+
+  .nav button{
+    min-width:70px;
+    font-size:13px;
+  }
+
+  .left{
+    width:260px;
+  }
+
+  .right{
+    width:270px;
+  }
+
+  .loadout{
+    right:295px;
+  }
+
+}
+
+@media(max-width:750px){
+
+  .top{
+    height:60px;
+  }
+
+  .logo{
+    width:auto;
+    padding-left:12px;
+    font-size:37px;
+  }
+
+  .logo small{
+    display:none;
+  }
+
+  .nav{
+    display:none;
+  }
+
+  .left{
+    top:72px;
+    left:10px;
+    width:230px;
+  }
+
+  .menu{
+    display:none;
+  }
+
+  .right{
+    right:10px;
+    top:72px;
+    width:230px;
+  }
+
+  .map{
+    height:150px;
+  }
+
+  .match{
+    height:105px;
+  }
+
+  .loadout,
+  .shortcuts{
+    display:none;
+  }
+
+  .footer{
+    padding:0 10px;
+  }
+
+  .footer-right{
+    display:none;
+  }
+
+}
+</style>
+</head>
+
+<body>
+
+<div id="lobby">
+
+  <div id="background"></div>
+
+  <div class="scanlines"></div>
+
+  <!-- ===================================================
+       TOP NAV
+  =================================================== -->
+
+  <header class="top">
+
+    <div class="logo">
+      KTR<span>X</span>
+      <small>KATIHAR BATTLE ROYALE</small>
+    </div>
+
+    <nav class="nav">
+
+      <button class="active">LOBBY</button>
+      <button>WEAPONS</button>
+      <button>CHARACTER</button>
+      <button>INVENTORY</button>
+      <button>BATTLE PASS</button>
+      <button>STORE</button>
+
+    </nav>
+
+    <div class="resources">
+
+      <div class="money">
+        <div class="coin">K</div>
+        1,250
+      </div>
+
+      <div class="money">
+        <div class="gem"></div>
+        320
+      </div>
+
+      <button class="topbtn">+</button>
+      <button class="topbtn">♟</button>
+      <button class="topbtn">✉</button>
+      <button class="topbtn">⚙</button>
+
+    </div>
+
+  </header>
+
+
+  <!-- ===================================================
+       LEFT
+  =================================================== -->
+
+  <section class="left">
+
+    <div class="profile">
+
+      <div class="avatar">K</div>
+
+      <div class="profile-info">
+
+        <div class="id">
+          KTRX-000001
+        </div>
+
+        <div class="level">
+          LV. <b>12</b>
+        </div>
+
+        <div class="xp">
+          <i></i>
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="menu">
+
+      <button class="menu-item">
+
+        <div class="menu-icon">📍</div>
+
+        <div>
+          <div class="menu-label">KATIHAR</div>
+          <span class="menu-small">OUR ARENA</span>
+        </div>
+
+      </button>
+
+
+      <button class="menu-item">
+
+        <div class="menu-icon">◈</div>
+
+        <div>
+          <div class="menu-label">BATTLE PASS</div>
+          <span class="menu-small">SEASON 01</span>
+        </div>
+
+        <div class="notification"></div>
+
+      </button>
+
+
+      <button class="menu-item">
+
+        <div class="menu-icon">★</div>
+
+        <div class="menu-label">
+          EVENTS
+        </div>
+
+        <div class="notification"></div>
+
+      </button>
+
+
+      <button class="menu-item">
+
+        <div class="menu-icon">☷</div>
+
+        <div class="menu-label">
+          MISSIONS
+        </div>
+
+        <div class="notification"></div>
+
+      </button>
+
+
+      <button class="menu-item">
+
+        <div class="menu-icon">▥</div>
+
+        <div class="menu-label">
+          LEADERBOARD
+        </div>
+
+      </button>
+
+    </div>
+
+  </section>
+
+
+  <!-- ===================================================
+       RIGHT
+  =================================================== -->
+
+  <section class="right">
+
+    <div class="map">
+
+      <div class="map-grid"></div>
+
+      <div class="map-title">
+        KATIHAR MAP
+      </div>
+
+      <div class="zone"></div>
+
+      <div
+        class="map-dot"
+        style="left:46%;top:53%">
+      </div>
+
+      <div
+        class="map-dot enemy"
+        style="left:70%;top:38%">
+      </div>
+
+      <div
+        class="map-dot enemy"
+        style="left:30%;top:67%">
+      </div>
+
+      <div
+        class="map-dot"
+        style="left:58%;top:28%">
+      </div>
+
+      <div class="expand">
+        ⛶
+      </div>
+
+    </div>
+
+
+    <!-- SOLO ONLY -->
+
+    <button class="solo">
+
+      👤 &nbsp; SOLO
+
+      <small>
+        30 PLAYERS • 25 MINUTES
+      </small>
+
+    </button>
+
+
+    <div class="match">
+
+      <h2>KATIHAR</h2>
+
+      <p>
+        REAL-WORLD BATTLE ROYALE
+      </p>
+
+      <div class="details">
+        30 PLAYERS &nbsp;|&nbsp; 25 MIN
+      </div>
+
+    </div>
+
+
+    <button
+      class="start"
+      onclick="startMatch()">
+
+      START MATCH
+
+      <small>
+        ENTER THE ZONE
+      </small>
+
+    </button>
+
+  </section>
+
+
+  <!-- ===================================================
+       LOADOUT
+  =================================================== -->
+
+  <section class="loadout">
+
+    <div class="slot">
+
+      <div class="slot-title">PRIMARY</div>
+
+      <div class="slot-art rifle"></div>
+
+      <div class="slot-name">
+        KX-416
+      </div>
+
+    </div>
+
+
+    <div class="slot">
+
+      <div class="slot-title">SECONDARY</div>
+
+      <div class="slot-art pistol"></div>
+
+      <div class="slot-name">
+        KX-9
+      </div>
+
+    </div>
+
+
+    <div class="slot">
+
+      <div class="slot-title">MELEE</div>
+
+      <div class="slot-art knife"></div>
+
+      <div class="slot-name">
+        KTRX BLADE
+      </div>
+
+    </div>
+
+
+    <div class="slot">
+
+      <div class="slot-title">GRENADE</div>
+
+      <div class="slot-art grenade"></div>
+
+      <div class="slot-name">
+        FRAG
+      </div>
+
+    </div>
+
+
+    <div class="slot">
+
+      <div class="slot-title">THROWABLE</div>
+
+      <div class="slot-art grenade"></div>
+
+      <div class="slot-name">
+        SMOKE
+      </div>
+
+    </div>
+
+
+    <div class="slot">
+
+      <div class="slot-title">UTILITY</div>
+
+      <div class="slot-art med"></div>
+
+      <div class="slot-name">
+        MED KIT
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- ===================================================
+       SHORTCUTS
+  =================================================== -->
+
+  <section class="shortcuts">
+
+    <button class="shortcut">
+      <span class="shortcut-icon">◉</span>
+      CHARACTER
+    </button>
+
+    <button class="shortcut">
+      <span class="shortcut-icon">▣</span>
+      VEHICLE
+    </button>
+
+    <button class="shortcut">
+      <span class="shortcut-icon">◆</span>
+      SKINS
+    </button>
+
+  </section>
+
+
+  <!-- ===================================================
+       FOOTER
+  =================================================== -->
+
+  <footer class="footer">
+
+    <div>
+      💬
+      <span class="world-chat">[WORLD]</span>
+      KTRX_SONU : Katihar lobby ready?
+    </div>
+
+    <div class="footer-right">
+      GPS : ACTIVE
+      &nbsp; • &nbsp;
+      SERVER : KATIHAR
+      &nbsp;
+      <span class="signal">▮▮▮▮</span>
+      30ms
+    </div>
+
+  </footer>
+
+</div>
+
+
+<!-- =====================================================
+     MATCHMAKING
+===================================================== -->
+
+<div
+  class="modal"
+  id="modal">
+
+  <div class="modal-box">
+
+    <div class="modal-title">
+      FINDING <span>MATCH.</span>
+    </div>
+
+    <div class="modal-info">
+
+      KTRX is searching for the next
+      available Katihar SOLO lobby.
+
+      <br><br>
+
+      Target:
+      <b>30 real players</b>
+      • Match duration:
+      <b>25 minutes</b>
+
+    </div>
+
+    <div class="progress">
+      <i></i>
+    </div>
+
+    <div
+      class="queue-status"
+      id="queueStatus">
+
+      SEARCHING FOR PLAYERS...
+
+    </div>
+
+    <button
+      class="cancel"
+      onclick="closeMatch()">
+
+      CANCEL SEARCH
+
+    </button>
+
+  </div>
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   NAVIGATION
+===================================================== */
+
+document
+.querySelectorAll(".nav button")
+.forEach(btn=>{
+
+  btn.addEventListener("click",()=>{
+
+    document
+    .querySelectorAll(".nav button")
+    .forEach(x=>x.classList.remove("active"));
+
+    btn.classList.add("active");
+
+  });
+
+});
+
+
+/* =====================================================
+   MATCHMAKING
+===================================================== */
+
+let t1,t2,t3;
+
+function startMatch(){
+
+  document
+  .getElementById("modal")
+  .classList.add("open");
+
+  const status=
+    document.getElementById("queueStatus");
+
+  status.textContent=
+    "SEARCHING FOR PLAYERS...";
+
+  t1=setTimeout(()=>{
+
+    status.textContent=
+      "KATIHAR LOBBY — 18 / 30";
+
+  },1800);
+
+  t2=setTimeout(()=>{
+
+    status.textContent=
+      "KATIHAR LOBBY — 27 / 30";
+
+  },4000);
+
+  t3=setTimeout(()=>{
+
+    status.textContent=
+      "MATCH READY — 30 / 30";
+
+  },6200);
+
+}
+
+
+function closeMatch(){
+
+  clearTimeout(t1);
+  clearTimeout(t2);
+  clearTimeout(t3);
+
+  document
+  .getElementById("modal")
+  .classList.remove("open");
+
+}
+
+
+/* =====================================================
+   MENU FEEDBACK
+===================================================== */
+
+document
+.querySelectorAll(".menu-item")
+.forEach(item=>{
+
+  item.addEventListener("click",()=>{
+
+    item.animate(
+      [
+        {transform:"translateX(0)"},
+        {transform:"translateX(6px)"},
+        {transform:"translateX(0)"}
+      ],
+      {
+        duration:180
+      }
+    );
+
+  });
+
+});
+
+</script>
+
+</body>
+</html>
